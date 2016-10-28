@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>React - Boards</title>
+
+    <link rel="stylesheet" crossorigin="anonymous"
+          href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u">
+    <link rel="stylesheet" href="../../css/main.css">
+
+    <script src="../../js/react.min.js"></script>
+    <script src="../../js/react-dom.min.js"></script>
+    <!--library to convert ESJS to pure jS code-->
+    <script src="../../js/browser.min.js"></script>
+</head>
+<body>
+
+<div id="container"></div>
+
+<script type="text/babel">
+    var Form = React.createClass({
+        getInitialState: function () {
+            return {
+                info: {},
+                placeholder: {
+                  'first' : 'First Name',
+                  'last' : 'Last Name',
+                  'address' : 'Billing Address',
+                  'card' : 'Card Number'
+                },
+                isSubmit: false,
+                type: null,
+                alert: null
+            }
+        },
+
+
+
+        submitForm: function () {
+            var firstName = this.refs.first.value;
+            var lastName = this.refs.last.value;
+            var billingAddress = this.refs.address.value;
+            var cardNumber = this.refs.card.value;
+
+            if(!firstName || !lastName || !billingAddress || !cardNumber){
+                this.setState({
+                    alert: 'All fields are required!',
+                    isSubmit: false
+                });
+            } else {
+                this.setState({
+                    info: {
+                        first: firstName,
+                        last: lastName,
+                        address: billingAddress,
+                        card: cardNumber
+                    },
+                    isSubmit: true
+                });
+            }
+
+
+        },
+
+        backToForm: function () {
+          this.setState({
+              isSubmit: false,
+              type: null
+          });
+        },
+
+        focusFirst: function () {
+            this.refs.first.value = this.state.placeholder.first;
+        },
+
+        focusLast: function () {
+            this.refs.last.value = this.state.placeholder.last;
+        },
+
+        focusAddress: function () {
+            this.refs.address.value = this.state.placeholder.address;
+        },
+
+        validCard: function () {
+            function getCreditCardType(accountNumber)
+            {
+
+                //start without knowing the credit card type
+                var result = "invalid";
+
+                //first check for MasterCard
+                if (/^5[1-5]/.test(accountNumber))
+                {
+                    result = "mastercard";
+                }
+
+                //then check for Visa
+                else if (/^4/.test(accountNumber))
+                {
+                    result = "visa";
+                }
+
+                //then check for AmEx
+                else if (/^3[47]/.test(accountNumber))
+                {
+                    result = "amex";
+                }
+
+                return result;
+            }
+
+            var cardNumber = this.refs.card.value;
+            var cardType = getCreditCardType(parseInt(cardNumber));
+            console.log('cardType:', cardType);
+            this.setState({
+                type: cardType
+            });
+        },
+
+        renderForm: function() {
+            return (
+                        <form name="userInfoForm">
+                            <div className="form-group">
+                                <label>First Name</label>
+                                <input type="text" className="form-control" ref="first" placeholder={this.state.placeholder.first}
+                                       onFocus={this.focusFirst}/>
+                            </div>
+                            <div className="form-group">
+                                <label>Last Name</label>
+                                <input type="text" className="form-control" ref="last" placeholder={this.state.placeholder.last}
+                                       onFocus={this.focusLast}/>
+                            </div>
+                            <div className="form-group">
+                                <label>Billing Address</label>
+                                <input type="text" className="form-control" ref="address" placeholder={this.state.placeholder.address}
+                                       onFocus={this.focusAddress}/>
+                            </div>
+                            <div className="form-group">
+                                <label>Card Number</label>
+                                <input type="text" className="form-control" ref="card" placeholder={this.state.placeholder.card}
+                                       onChange={this.validCard}/>
+                                <h4><span className="label label-primary">{this.state.type || ''}</span></h4>
+                            </div>
+                            <div className="alert alert-danger" role="alert">{this.state.alert || 'Please enter...'}</div>
+                            <button type="button" className="btn btn-primary" onClick={this.submitForm}>
+                                Submit</button>
+                        </form>
+            )
+        },
+
+        renderResult: function() {
+          return (
+                  <div className="container">
+                      <table>
+                          <thead>
+                          <tr>
+                              <th>First Name</th>
+                              <th>Last Name</th>
+                              <th>Billing Address</th>
+                              <th>Card Number</th>
+                              <th>Card Type</th>
+                          </tr>
+                          </thead>
+                          <tbody>
+                          <tr>
+                              <td>{this.state.info.first}</td>
+                              <td>{this.state.info.last}</td>
+                              <td>{this.state.info.address}</td>
+                              <td>{this.state.info.card}</td>
+                              <td>{this.state.type}</td>
+                          </tr>
+                          </tbody>
+                      </table>
+                      <hr/>
+                      <button type="button" className="btn btn-default" onClick={this.backToForm}>
+                          Back</button>
+                  </div>
+          )
+        },
+
+        render: function() {
+            if(this.state.isSubmit) {
+                return this.renderResult();
+            } else {
+                return this.renderForm();
+            }
+        }
+    });
+
+    ReactDOM.render(
+            <Form/>,
+            document.getElementById('container')
+    );
+</script>
+
+</body>
+</html>
